@@ -83,8 +83,8 @@
 			<div class="d-flex flex-column w-100 m-auto justify-content-center">
 				
 				<div class="d-flex flex-row justify-content-center">
-					<h3 class="" style="color:red;">Outputs:</h3> 
-					<a class="btn btn-dark flbutton" href="#" @click.prevent="clearResults" >CLEAR</a>
+					<h3 class="" style="color:red;">Outputs </h3> 
+					<button type="button" class="btn btn-dark m-1" @click.prevent="clearResults">CLEAR</button>
 				</div>
 				<div class="row w-100">
 					<div class="border border-secondary" style="height:400px; overflow-y:scroll;" id="results_area" v-html="resultsHtml"></div>
