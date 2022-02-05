@@ -1,0 +1,25 @@
+{
+  "name": "sample-node.js-app-using-websocket-front-back-end",
+  "version": "1.0.0",
+  "description": "Sample Node.js app [Front &amp; Back] using WebSockets",
+  "main": "app/app.js",
+  "scripts": {
+    "start": "nodemon ./app/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ttodua/Sample-Node.js-app-using-websocket-Front-Back-end.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ttodua/Sample-Node.js-app-using-websocket-Front-Back-end/issues"
+  },
+  "homepage": "https://github.com/ttodua/Sample-Node.js-app-using-websocket-Front-Back-end#readme",
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.2",
+    "ws": "^8.4.2"
+  }
+}
