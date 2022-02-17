@@ -12,6 +12,7 @@ var VUEAPP = Vue.createApp({
 			resultsHtml : '',
 			// placeholders
 			WS_is_connected : false,
+			rocketWasStartedInBack : false,
 		};
 	},
 	watch:{ 
@@ -29,9 +30,6 @@ var VUEAPP = Vue.createApp({
 		formdata(){
 			return helpers.formToJson(this.$refs['mainForm']);
 		},	
-		sendAjaxButtonClicked(){
-			console.log("AJAX-SEND not implemented");
-		},
 		sendWsButtonClicked(){
 			this.sendToBack( 'my_form_send_button', this.formdata() );
 		},	
@@ -68,7 +66,7 @@ var VUEAPP = Vue.createApp({
 				if (action == 'text_message') {
 					// do whatever you want with data
 				} else if (action == 'rocket_start_action') {
-					// do whatever you want with data
+					this.rocketWasStartedInBack = true;
 				}
 				this.writeToResults(msg, true, true);
 			}

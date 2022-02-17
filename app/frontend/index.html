@@ -71,24 +71,24 @@
 			</div>
 
 			
+
+			<div class="d-flex flex-column align-items-center p-2 justify-content-around" style="background:#e7e7e7;"> 
+				<div class="container w-100 dflex flex-row justify-content-center">
+					<button type="button" class="btn btn-success m-1" @click.prevent="sendWsButtonClicked">SEND From data (WS)</button>
+				</div>
+			</div>
+			<!--------------------------------------------------->
+			<div><hr/></div>
 			<div class="row w-75">
 				<div class="col-md-4">
 					Sample action button: 
 				</div>
 				<div class="col-md-8">
 					<button type="button" class="btn btn-success m-1" @click.prevent="buttonStartRocket">Start my rocket</button>
+					 <span v-if="rocketWasStartedInBack" style="color:red;"> Booom! rocket start is confirmed</span>
 				</div>
 			</div>
  
-
-			<div class="d-flex flex-column align-items-center p-2 justify-content-around" style="background:#e7e7e7;"> 
-				<div class="container w-100 dflex flex-row justify-content-center">
-					<button type="button" class="btn btn-success m-1" @click.prevent="sendAjaxButtonClicked"  disabled>SEND data (AJAX)</button>
-					<button type="button" class="btn btn-success m-1" @click.prevent="sendWsButtonClicked">SEND From data (WS)</button>
-				</div>
-			</div>
-			<!--------------------------------------------------->
-
 			<div><hr/></div>
 
 			<div class="d-flex flex-column w-100 m-auto justify-content-center">

@@ -2,8 +2,6 @@
 // ########################### START ########################## //
 // ############################################################ //
 
-const useAjaxToo = false;
-
 const path      = require("path");
 const fs        = require('fs');
 const express   = require('express');
@@ -24,9 +22,7 @@ const MainApp = {
 		this.set_node_params();
 		this.init_frontend_engine(); 
 		this.init_websocket_server();
-		if (useAjaxToo) {
-			this.init_ajax_api();
-		}
+		// this.init_ajax_api();
 		this.myProgramInstance = new MyProgram(this);
 	},
 
@@ -106,15 +102,15 @@ const MainApp = {
 		}
 	},
 
-	init_ajax_api()
-	{
-		const self = this;
-		this.app.post(this.sampleAjaxResponderPage, (req, res) => {
-			var params = req.body;  
-			console.log("[Backend: POST received]:"+ JSON.stringify(params) );
-			res.json(answ);
-		});
-	},
+	// init_ajax_api()
+	// {
+	// 	const self = this;
+	// 	this.app.post(this.sampleAjaxResponderPage, (req, res) => {
+	// 		var params = req.body;  
+	// 		console.log("[Backend: POST received]:"+ JSON.stringify(params) );
+	// 		res.json(answ);
+	// 	});
+	// },
 }
 
 
