@@ -8,12 +8,10 @@ var VUEAPP = Vue.createApp({
 			chosenSelect1 : 'dog',
 			myObj : {'key1':'val1', 'key2':'val2'},
 			mycheckboxEnabled : 123,
-			
 			someInputValue : 'myInput1Value',
 			resultsHtml : '',
-
-			isAjaxSendDisabled : true,
-			WS_Connected : false,
+			// placeholders
+			WS_is_connected : false,
 		};
 	},
 	watch:{ 
@@ -28,25 +26,28 @@ var VUEAPP = Vue.createApp({
 		},
 	},
 	methods:{  
-		frmdata(){
-			return helpers.formItemsToJson(this.$refs['mainForm']);
-		},
-		sendWsButtonClicked(){
-			WS_MESSAGE_SEND( 'my_send_button_event', {animal: this.chosenSelect1, inputVal1: this.myInput1Value} );
-		},		
+		formdata(){
+			return helpers.formToJson(this.$refs['mainForm']);
+		},	
 		sendAjaxButtonClicked(){
 			console.log("AJAX-SEND not implemented");
 		},
-		
-		writeToResults(txt){
-			console.log(txt);
-			let box =document.querySelector("#results_area"); 
+		sendWsButtonClicked(){
+			this.sendToBack( 'my_form_send_button', this.formdata() );
+		},	
+		buttonStartRocket() {
+			this.sendToBack( 'start_my_rocket', {exampleKey: 'exampleValue'} );
+		},
+
+		writeToResults(txt, withPrefix=true, isReceived=true){
+			let prefix = withPrefix ? '<span class="resultPrefix">● [Frontend]' + (isReceived? ' (Received from backend)':'')+'</span> ' : '';
+			txt = prefix + txt;
 			if (typeof this.resultsArr==='undefined'){
 				this.resultsArr = [];
 			}
 			this.resultsArr.push(`<div>${txt}</div>`);
 			this.resultsArr = helpers.arrayPart(this.resultsArr, 300, 'end'); //show only first 300 lines
-			this.resultsHtml = this.resultsArr.slice().reverse().join('');
+			this.resultsHtml = this.resultsArr.slice().join('');
 		},
 		clearResults(event){
 			event.preventDefault();
@@ -55,22 +56,32 @@ var VUEAPP = Vue.createApp({
 		},
 
 		WS_CONNECTION_STATE(connected_or_disconnected){
-			this.WS_Connected = connected_or_disconnected; 
+			this.WS_is_connected = connected_or_disconnected; 
 		},
 		
-		WsMsgCallback(msg, receive=true){ 
+		receivedCallback(msg){ 
 			try
 			{
-				let msgFinal='';
-				try      { msgFinal = JSON.parse(msg); }
-				catch(ex){ msgFinal = msg; }
-				let prefix = '<span class="resultPrefix">● [Frontend]' + (receive? ' (Received from backend)':'')+'</span> ';
-				this.writeToResults(prefix + msgFinal);
+				let receivedObject= JSON.parse(msg);
+				let action = receivedObject.act_name;
+				let data = receivedObject.act_data;
+				if (action == 'text_message') {
+					// do whatever you want with data
+				} else if (action == 'rocket_start_action') {
+					// do whatever you want with data
+				}
+				this.writeToResults(msg, true, true);
 			}
 			catch(ex){
-				this.writeToResults(" ! ! ! [Frontend: Exception while parsing received message] " + msg + "\n\t(Exception: "+ex.toString()+")");
+				this.writeToResults(" ! ! ! Exception while parsing received message " + msg + "\n\t(Exception: "+ex.toString()+")", true, false);
 			}
 		},
+
+		sendToBack(myActionName, dataTosend){ 
+			let stringified = JSON.stringify( {actionName: myActionName, data:dataTosend} );
+			WsContainer.send( stringified ) ;
+			VUEAPP.writeToResults("Send to backend: " + stringified, true, false);
+		}
 	},
 }).mount('#vue_app');
 // ######################## END ######################## //
@@ -87,31 +98,22 @@ function Ws_Create_Connection()
 	const url = 'ws://127.0.0.1:'+window['GLOBAL_WSS_PORT'];
 	const connection = new WebSocket(url); 
 	connection.onopen = () => {
-		WS_MESSAGE_RECEIVED('WS-OPEN signal', false) ;
-		WS_MESSAGE_SEND('ws_open_action_name', 'WS Initialization signal - sending to backend');
+		VUEAPP.writeToResults("WS connection started", true, false);
+		VUEAPP.sendToBack('ws_open_action_name', 'Hey, handshake, websocket was opened here, in frontend');
 		VUEAPP.WS_CONNECTION_STATE(true);
 	}
 	connection.onclose = () => {
-		WS_MESSAGE_RECEIVED('WS closed', false);
+		VUEAPP.writeToResults("WS connection was closed", true, false);
 		VUEAPP.WS_CONNECTION_STATE(false);
 	}
 	connection.onerror = (error) => {
-		WS_MESSAGE_RECEIVED(`WS error:` + JSON.stringify(error));
+		VUEAPP.writeToResults("WS connection error:"+JSON.stringify(error), true, false);
 		connection.close();
 	}
 	connection.onmessage = (e) => {
-		WS_MESSAGE_RECEIVED(e.data);
+		VUEAPP.receivedCallback(e.data);
 	}
 	return connection;
-} 
-
-function WS_MESSAGE_SEND(myActionName, dataTosend){ 
-	let stringified = JSON.stringify( {actionName: myActionName, data:dataTosend} );
-	WsContainer.send( stringified ) ;
-	VUEAPP.WsMsgCallback("Send to backend: " + stringified, false);
-}
-function WS_MESSAGE_RECEIVED(what, isReceivedMessage = true){
-	VUEAPP.WsMsgCallback(what, isReceivedMessage);
 }
 
 var WsContainer;
@@ -122,7 +124,7 @@ function recreateWs(autoReconnectInterval)
 	}
 	setInterval(function(){ 
 		if(WsContainer.readyState!=1){
-			VUEAPP.WsMsgCallback("Recreate WS connection",false);
+			VUEAPP.receivedCallback("Recreate WS connection", true, false);
 			WsContainer.close();
 			WsContainer=Ws_Create_Connection();
 		}
@@ -137,7 +139,9 @@ recreateWs(2000);
 
 // ######################## LIBRARY ######################## //
 const helpers = {
-	formItemsToJson(FormElement){    
+
+	// shame of JS, but there doesnt exist any equivalent native function
+	formToJson(FormElement){    
 		let formDataEntries = new FormData(FormElement).entries();
 		const handleChild = function (obj,keysArr,value){
 			let firstK = keysArr.shift();
@@ -148,8 +152,7 @@ const helpers = {
 					obj.push(value);
 				}
 				else obj[firstK] = value; 
-			} 
-			else{
+			} else {
 				if (firstK=='') obj.push(value); 
 				else {
 					if ( ! ( firstK in obj) ) obj[firstK]={};

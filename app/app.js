@@ -10,35 +10,27 @@ const express   = require('express');
 const EJS   	= require('ejs');
 const WebSocket = require('ws');
 function c(x){ console.log(x); }
+const MyProgram   = require ('./backend/my_program.js');
 // ##########################
 
 
 const MainApp = {
 	wss : null,
 	app : null,
+	myProgramInstance : null,
 
 	INIT()
 	{
-		this.init_nodeserver();
-		this.init_frontend(); 
+		this.set_node_params();
+		this.init_frontend_engine(); 
 		this.init_websocket_server();
 		if (useAjaxToo) {
 			this.init_ajax_api();
 		}
+		this.myProgramInstance = new MyProgram(this);
 	},
 
-	sendToFront(obj){
-		const stringified = JSON.stringify(obj);
-		if(this.wss) {
-			console.log('[Backend Send]', stringified);
-			this.wss.send(stringified);
-		}
-		else { 
-			console.log("Backend WS hasn't received the connection. Can't send msg:", stringified); 
-		}
-	},
-
-	init_nodeserver()
+	set_node_params()
 	{
 		this.instanceStarted= false;
 		this.Server_Port    = 3456;
@@ -46,7 +38,7 @@ const MainApp = {
 		this.Server_Url     = 'http://127.0.0.1:'+this.Server_Port;
 	},
 
-	init_frontend()
+	init_frontend_engine()
 	{
 		this.app = express();
 		this.app.set('views', path.join(__dirname, 'frontend'));     // set custom root for view engine
@@ -54,7 +46,7 @@ const MainApp = {
 		this.app.engine('html', EJS.renderFile);
 
 		const self=this;
-		const myObject = {
+		const sampleObject = {
 			'a' : 123,
 			'b' : 456,
 		};
@@ -63,7 +55,7 @@ const MainApp = {
 			res.render(__dirname + '/frontend/index.html', {
 				tradePage: self.sampleAjaxResponderPage,
 				WS_PORT: self.Ws_Port,
-				SOME_JSON_DATA: JSON.stringify( myObject ), 
+				SOME_JSON_DATA: JSON.stringify( sampleObject ), 
 				ajaxurl: self.Server_Url
 			});
 			//res.sendFile(__dirname + '/index.html');
@@ -85,32 +77,35 @@ const MainApp = {
 
 	init_websocket_server()
 	{
-		let self = this; 
 		this.ws = new WebSocket.Server({ port: this.Ws_Port });
+		this.wss = null;
+		const self = this; 
 		this.ws.on('connection', W => {
 			self.wss = W;
-			self.sendToFront('Websocket connection started');
+			self.myProgramInstance.connectionEvent('start');
 			self.wss.on('message', message => {
-				try{
-					let respJson = JSON.parse(message); 
-					self.parse_received_WSDATA(respJson);
-				}
-				catch(ex){
-					console.log(ex);
-				}
+				let respJson = JSON.parse(message);
+				self.myProgramInstance.connectionEvent('incoming', respJson);
 			});
 			
 			self.wss.on('close', function close() {
-				console.log('[Backend] WS Disconnect');
+				self.myProgramInstance.connectionEvent('close');
 			});
 			
 		});
+
 	},
 
-	parse_received_WSDATA(jsonData){ 
-		console.log('[Backend: Received]', jsonData);
+	sendToFront(objData){
+		const stringified = JSON.stringify(objData);
+		if(this.wss) {
+			this.wss.send(stringified);
+		}
+		else { 
+			console.log("Backend WS hasn't received the connection. Can't send msg:", stringified); 
+		}
 	},
- 
+
 	init_ajax_api()
 	{
 		const self = this;

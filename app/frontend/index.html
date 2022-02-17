@@ -33,13 +33,13 @@
 	<div class="row d-flex justify-content-center text-center m-auto">
 		<h1 style="color:#0070ff; background:black; text-align:center;">My App</h1>
 		<img src="lib/image-1.svg"  class="img-thumbnail rounded float-center" style="width:100px;" />
-		<b style="color:red;" v-show="!WS_Connected">Websocket is not connected</b>
+		<b style="color:red;" v-show="!WS_is_connected">Websocket is not connected</b>
 	</div>
 
 	<div><hr/></div>
 	<div class="row d-flex flex-column align-items-center h-100">
 
-		<form id="mainform" ref="mainForm" action="" method="post" enctype="multipart/form-data" class="w-50 m-1" v-show="WS_Connected">
+		<form id="mainform" ref="mainForm" action="" method="post" enctype="multipart/form-data" class="w-50 m-1" v-show="WS_is_connected">
 
 			<div class="row w-50">
 				<div class="col">
@@ -61,19 +61,30 @@
 				</div>
 			</div>
 
-			<div class="row eachButtonCell">
+			<div class="row w-50">
 				<div class="col">
-					<h3>sample Checkbox</h3>
+					<span>Sample checkbox</span>
 				</div>
-				<div class="col">
+				<div class="col-md-4">
 					<input class="form-check-input" type="checkbox" name="myCheckbox" v-model="mycheckboxEnabled" />
 				</div>
 			</div>
 
+			
+			<div class="row w-75">
+				<div class="col-md-4">
+					Sample action button: 
+				</div>
+				<div class="col-md-8">
+					<button type="button" class="btn btn-success m-1" @click.prevent="buttonStartRocket">Start my rocket</button>
+				</div>
+			</div>
+ 
+
 			<div class="d-flex flex-column align-items-center p-2 justify-content-around" style="background:#e7e7e7;"> 
 				<div class="container w-100 dflex flex-row justify-content-center">
-					<button type="button" class="btn btn-success m-1" @click.prevent="sendWsButtonClicked">SEND data (WS)</button>
-					<button type="button" class="btn btn-success m-1" @click.prevent="sendAjaxButtonClicked"  v-bind:disabled="isAjaxSendDisabled">SEND data (AJAX)</button>
+					<button type="button" class="btn btn-success m-1" @click.prevent="sendAjaxButtonClicked"  disabled>SEND data (AJAX)</button>
+					<button type="button" class="btn btn-success m-1" @click.prevent="sendWsButtonClicked">SEND From data (WS)</button>
 				</div>
 			</div>
 			<!--------------------------------------------------->
@@ -103,7 +114,7 @@
     window.GLOBAL_AJAX_URL = '<%= ajaxurl %>'+'<%= tradePage %>'; 
     window.GLOBAL_SOME_STRINGIFIED_JSON =  JSON.parse('<%= SOME_JSON_DATA %>'.replace(/&#34;/g,'"')) ;
   </script>
-  <script type="text/javascript" src="./frontend/my_script.js"></script>
+  <script type="text/javascript" src="./frontend/my_front_script.js"></script>
 
 </body> 
 </html>
