@@ -20,6 +20,7 @@ class MyProgram {
                 console.log('[Backend] WS was closed');
                 break;
             default: // for 'incoming'
+                console.log('[Backend] WS data received', jsonData);
                 this.parse_received_data(jsonData);
                 break;
         }
@@ -28,8 +29,6 @@ class MyProgram {
 	parse_received_data(jsonData){ 
         let actionName = jsonData.actionName;
         let data = jsonData.data;
-        console.log('[Backend: Received]', jsonData);
-        
         if (actionName === 'start_my_rocket') {
             console.log('[Backend] starting my rocker, with data:', data);
             this.send('text_message', 'Your mission was complete, rocket started up!' );
