@@ -81,13 +81,13 @@
 			</div>
 			<!--------------------------------------------------->
 			<div><hr/></div>
-			<div class="row w-75">
+			<div class="row w-100">
 				<div class="col-md-4">
 					Sample action button: 
 				</div>
 				<div class="col-md-8">
-					<button type="button" class="btn btn-success m-1" @click.prevent="buttonStartRocket">Start my rocket</button>
-					 <span v-if="rocketWasStartedInBack" style="color:red;"> Booom! rocket start is confirmed</span>
+					<button type="button" class="btn btn-success m-1" @click.prevent="buttonStartRocket">Start my rocket (using WS)</button>
+					<span v-if="rocketWasStartedInBack" style="color:red;"> Booom! rocket start is confirmed</span>
 				</div>
 			</div>
  

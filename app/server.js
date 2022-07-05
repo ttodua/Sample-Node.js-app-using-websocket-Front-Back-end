@@ -29,6 +29,7 @@ class serverApp  {
 		this.HostPort_HTTP  = 3456;
 		this.HostUrl_HTTP   = 'http://127.0.0.1:'+this.HostPort_HTTP;
 		this.HostPort_WS  	= this.HostPort_HTTP + 1;
+		this.ajaxResponderApiPath  = '/myapi';
 	}
 
 	init_frontend_engine()
@@ -43,12 +44,11 @@ class serverApp  {
 			'a' : 123,
 			'b' : 456,
 		};
-		this.sampleAjaxResponderPage  = '/ajaxResponder';
 		this.app.get('/',function(req,res) {
 			res.render(__dirname + '/frontend/index.html', {
 				WS_PORT: self.HostPort_WS,
 				ajaxurl: self.HostUrl_HTTP,
-				tradePage: self.sampleAjaxResponderPage,
+				tradePage: self.ajaxResponderApiPath,
 				SOME_JSON_DATA: JSON.stringify( sampleObject ), 
 			});
 			//res.sendFile(__dirname + '/index.html');
@@ -102,7 +102,7 @@ class serverApp  {
 	init_ajax_api()
 	{
 	 	const self = this;
-	 	this.app.post(this.sampleAjaxResponderPage, (req, res) => {
+	 	this.app.post(this.ajaxResponderApiPath, (req, res) => {
 	 		var params = req.body;  
 	 		console.log("[Backend] AJAX POST received:"+ JSON.stringify(params) );
 	 		res.json({'key1':'Hello from backend, I have an advise - migrate to WS instead of AJAX'});
