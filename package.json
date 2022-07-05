@@ -4,7 +4,7 @@
   "description": "Sample Node.js app [Front &amp; Back] using WebSockets",
   "main": "app/app.js",
   "scripts": {
-    "start": "nodemon ./app/app.js",
+    "start": "nodemon ./app/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

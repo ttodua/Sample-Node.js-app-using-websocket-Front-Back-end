@@ -74,7 +74,13 @@
 
 			<div class="d-flex flex-column align-items-center p-2 justify-content-around" style="background:#e7e7e7;"> 
 				<div class="container w-100 dflex flex-row justify-content-center">
-					<button type="button" class="btn btn-success m-1" @click.prevent="sendWsButtonClicked">SEND From data (WS)</button>
+					<button type="button" class="btn btn-success m-1" @click.prevent="sendWsButtonClicked">SEND form-data (using WS)</button>
+				</div>
+			</div>
+
+			<div class="d-flex flex-column align-items-center p-2 justify-content-around" style="background:#e7e7e7;"> 
+				<div class="container w-100 dflex flex-row justify-content-center">
+					<button type="button" class="btn btn-success m-1" @click.prevent="sendAjaxButtonClicked">SEND form-data (using AJAX)</button>
 				</div>
 			</div>
 			<!--------------------------------------------------->

@@ -1,30 +1,27 @@
-// ############################################################ //
-// ########################### START ########################## //
-// ############################################################ //
-
-const path      = require("path");
+// ######## imports ########### //
+const path      = require('path');
 const fs        = require('fs');
 const express   = require('express');
 const EJS   	= require('ejs');
 const WebSocket = require('ws');
-function c(x){ console.log(x); }
 const MyProgram   = require ('./backend/my_program.js');
-// ##########################
+function c(x){ console.log(x); }
+// ########################## //
 
 
-const MainApp = {
-	wss : null,
-	app : null,
-	myProgramInstance : null,
+class serverApp  {
+	wss = null;
+	app = null;
+	myProgramInstance = null;
 
 	INIT()
 	{
 		this.set_node_params();
 		this.init_frontend_engine(); 
 		this.init_websocket_server();
-		// this.init_ajax_api();
+		this.init_ajax_api();
 		this.myProgramInstance = new MyProgram(this);
-	},
+	}
 
 	set_node_params()
 	{
@@ -32,7 +29,7 @@ const MainApp = {
 		this.Server_Port    = 3456;
 		this.Ws_Port  		= this.Server_Port + 1;
 		this.Server_Url     = 'http://127.0.0.1:'+this.Server_Port;
-	},
+	}
 
 	init_frontend_engine()
 	{
@@ -68,7 +65,7 @@ const MainApp = {
 		this.app.listen(this.Server_Port, () => {
 			console.log('Webserver running at '+ this.Server_Url);
 		});
-	},
+	}
 
 
 	init_websocket_server()
@@ -90,7 +87,7 @@ const MainApp = {
 			
 		});
 
-	},
+	}
 
 	sendToFront(objData){
 		const stringified = JSON.stringify(objData);
@@ -98,22 +95,21 @@ const MainApp = {
 			this.wss.send(stringified);
 		}
 		else { 
-			console.log("Backend WS hasn't received the connection. Can't send msg:", stringified); 
+			console.log("[Backend] WS hasn't received the connection. Can't send msg:", stringified); 
 		}
-	},
+	}
 
-	// init_ajax_api()
-	// {
-	// 	const self = this;
-	// 	this.app.post(this.sampleAjaxResponderPage, (req, res) => {
-	// 		var params = req.body;  
-	// 		console.log("[Backend: POST received]:"+ JSON.stringify(params) );
-	// 		res.json(answ);
-	// 	});
-	// },
+	init_ajax_api()
+	{
+	 	const self = this;
+	 	this.app.post(this.sampleAjaxResponderPage, (req, res) => {
+	 		var params = req.body;  
+	 		console.log("[Backend] AJAX POST received:"+ JSON.stringify(params) );
+	 		res.json({'key1':'Hello from backend! I have a reccomendation for you from database:) You do not need to use AJAX, as WEBSOCKET is superior and can do everything, so try to migrate'});
+	 	});
+	}
 }
 
-
-MainApp.INIT();
+(new serverApp()).INIT();
 
  

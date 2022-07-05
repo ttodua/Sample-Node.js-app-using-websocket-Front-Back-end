@@ -32,7 +32,17 @@ var VUEAPP = Vue.createApp({
 		},	
 		sendWsButtonClicked(){
 			this.sendToBack( 'my_form_send_button', this.formdata() );
-		},	
+		},
+		sendAjaxButtonClicked(){
+			$.post(window['GLOBAL_AJAX_URL'], this.formdata())
+				.done(function(data) {
+					alert( "Success! answer was: " + JSON.stringify(data));
+				})
+				.fail(function(err) {
+					alert( "error: "+ err );
+				});
+		},
+		
 		buttonStartRocket() {
 			this.sendToBack( 'start_my_rocket', {exampleKey: 'exampleValue'} );
 		},
