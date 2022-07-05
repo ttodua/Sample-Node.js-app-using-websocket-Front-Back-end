@@ -27,9 +27,8 @@ class serverApp  {
 	{
 		this.instanceStarted= false;
 		this.HostPort_HTTP  = 3456;
-		this.HostPort_WS  	= this.HostPort_HTTP + 1;
 		this.HostUrl_HTTP   = 'http://127.0.0.1:'+this.HostPort_HTTP;
-		this.HostUrl_WS     = 'http://127.0.0.1:'+this.HostPort_WS;
+		this.HostPort_WS  	= this.HostPort_HTTP + 1;
 	}
 
 	init_frontend_engine()
