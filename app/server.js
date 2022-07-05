@@ -26,9 +26,10 @@ class serverApp  {
 	set_node_params()
 	{
 		this.instanceStarted= false;
-		this.Server_Port    = 3456;
-		this.Ws_Port  		= this.Server_Port + 1;
-		this.Server_Url     = 'http://127.0.0.1:'+this.Server_Port;
+		this.HostPort_HTTP  = 3456;
+		this.HostPort_WS  	= this.HostPort_HTTP + 1;
+		this.HostUrl_HTTP   = 'http://127.0.0.1:'+this.HostPort_HTTP;
+		this.HostUrl_WS     = 'http://127.0.0.1:'+this.HostPort_WS;
 	}
 
 	init_frontend_engine()
@@ -46,10 +47,10 @@ class serverApp  {
 		this.sampleAjaxResponderPage  = '/ajaxResponder';
 		this.app.get('/',function(req,res) {
 			res.render(__dirname + '/frontend/index.html', {
+				WS_PORT: self.HostPort_WS,
+				ajaxurl: self.HostUrl_HTTP,
 				tradePage: self.sampleAjaxResponderPage,
-				WS_PORT: self.Ws_Port,
 				SOME_JSON_DATA: JSON.stringify( sampleObject ), 
-				ajaxurl: self.Server_Url
 			});
 			//res.sendFile(__dirname + '/index.html');
 		});	 
@@ -62,15 +63,15 @@ class serverApp  {
 		this.app.use(bodyParser.json());
 		this.app.use(bodyParser.urlencoded({ extended: true }));
 
-		this.app.listen(this.Server_Port, () => {
-			console.log('Webserver running at '+ this.Server_Url);
+		this.app.listen(this.HostPort_HTTP, () => {
+			console.log('web http server running at '+ this.HostUrl_HTTP);
 		});
 	}
 
 
 	init_websocket_server()
 	{
-		this.ws = new WebSocket.Server({ port: this.Ws_Port });
+		this.ws = new WebSocket.Server({ port: this.HostPort_WS });
 		this.wss = null;
 		const self = this; 
 		this.ws.on('connection', W => {
@@ -105,7 +106,7 @@ class serverApp  {
 	 	this.app.post(this.sampleAjaxResponderPage, (req, res) => {
 	 		var params = req.body;  
 	 		console.log("[Backend] AJAX POST received:"+ JSON.stringify(params) );
-	 		res.json({'key1':'Hello from backend! I have a reccomendation for you from database:) You do not need to use AJAX, as WEBSOCKET is superior and can do everything, so try to migrate'});
+	 		res.json({'key1':'Hello from backend, I have an advise - migrate to WS instead of AJAX'});
 	 	});
 	}
 }
