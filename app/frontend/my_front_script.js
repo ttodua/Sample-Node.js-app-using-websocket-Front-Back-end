@@ -34,11 +34,12 @@ var VUEAPP = Vue.createApp({
 			this.sendToBack( 'my_form_send_button', this.formdata() );
 		},
 		sendAjaxButtonClicked(){
-			$.post(window['GLOBAL_AJAX_URL'], this.formdata())
-				.done(function(data) {
-					alert( "Success! answer was: " + JSON.stringify(data));
+			fetch(window['GLOBAL_AJAX_URL'], {method: 'POST', body: JSON.stringify(this.formdata())})
+				.then(response => response.json())
+				.then(data => {
+					alert( "Success! answer was:\n" + JSON.stringify(data));
 				})
-				.fail(function(err) {
+				.catch(function(err) {
 					alert( "error: "+ err );
 				});
 		},

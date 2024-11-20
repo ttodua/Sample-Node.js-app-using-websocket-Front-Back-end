@@ -10,7 +10,7 @@ function c(x){ console.log(x); }
 
 
 class serverApp  {
-	wss = null;
+	ws = null;
 	app = null;
 	myProgramInstance = null;
 
@@ -71,28 +71,34 @@ class serverApp  {
 	init_websocket_server()
 	{
 		this.ws = new WebSocket.Server({ port: this.HostPort_WS });
-		this.wss = null;
 		const self = this; 
 		this.ws.on('connection', W => {
-			self.wss = W;
-			self.myProgramInstance.connectionEvent('start');
-			self.wss.on('message', message => {
-				let respJson = JSON.parse(message);
-				self.myProgramInstance.connectionEvent('incoming', respJson);
+			const clientId = crypto.randomUUID();
+			W.id = clientId;
+			self.myProgramInstance.connectionEvent(clientId, 'start');
+			W.on('message', (data)=> {
+				let respJson = JSON.parse(data);
+				self.myProgramInstance.connectionEvent(clientId, 'incoming', respJson);
 			});
-			
-			self.wss.on('close', function close() {
-				self.myProgramInstance.connectionEvent('close');
+			//
+			W.on('close', function close() {
+				self.myProgramInstance.connectionEvent(clientId, 'close');
 			});
 			
 		});
 
 	}
 
-	sendToFront(objData){
+	sendToFront(clientId, objData) {
 		const stringified = JSON.stringify(objData);
-		if(this.wss) {
-			this.wss.send(stringified);
+		if(this.ws) {
+			for (const WsClient of this.ws.clients) {
+				const currentClientId = (WsClient).id;
+				if (currentClientId !== clientId) {
+					continue;
+				}
+				WsClient.send(stringified);
+			}
 		}
 		else { 
 			console.log("[Backend] WS hasn't received the connection. Can't send msg:", stringified); 
@@ -104,8 +110,8 @@ class serverApp  {
 	 	const self = this;
 	 	this.app.post(this.ajaxResponderApiPath, (req, res) => {
 	 		var params = req.body;  
-	 		console.log("[Backend] AJAX POST received:"+ JSON.stringify(params) );
-	 		res.json({'key1':'Hello from backend, I have an advise - migrate to WS instead of AJAX'});
+	 		console.log("[Backend] REST POST received:"+ JSON.stringify(params) );
+	 		res.json({'key1':'Hello from backend, I have an advise - migrate to WS instead of REST'});
 	 	});
 	}
 }
